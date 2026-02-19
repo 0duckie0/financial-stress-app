@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Financial Stress Score</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 20px;
+            width: 400px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            color: white;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 20px 0;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input:focus {
+            box-shadow: 0 0 8px #00f5d4;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            border: none;
+            background: #00f5d4;
+            color: black;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            box-shadow: 0 0 20px #00f5d4;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .score {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .low { color: #00ff99; }
+        .moderate { color: #ffcc00; }
+        .high { color: #ff4d4d; }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <h2>Financial Stress Calculator</h2>
+
+        <form method="POST" action="/calculate">
+
+            <label>Monthly Income (₹)</label>
+            <input type="number" name="income" required>
+
+            <label>Monthly Expenses (₹)</label>
+            <input type="number" name="expenses" required>
+
+            <label>Total EMI (₹)</label>
+            <input type="number" name="emi" required>
+
+            <label>Current Savings (₹)</label>
+            <input type="number" name="savings" required>
+
+            <button type="submit">Calculate Stress</button>
+
+        </form>
+
+        {% if score %}
+        <div class="result">
+            <div class="score">Stress Score: {{ score }}</div>
+
+            {% if risk == "Low Risk" %}
+                <div class="low">Low Financial Risk</div>
+            {% elif risk == "Moderate Risk" %}
+                <div class="moderate">Moderate Financial Risk</div>
+            {% else %}
+                <div class="high">High Financial Risk</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+
+</body>
+</html>
