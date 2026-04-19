@@ -1,8 +1,19 @@
 import os
 from flask import Flask, request, render_template
+import joblib
+import numpy as np
 
 app = Flask(__name__)
 
+# Load ML model
+try:
+    model = joblib.load("model.pkl")
+    model_loaded = True
+except:
+    model_loaded = False
+
+
+# Rule-based fallback (Phase 1 logic)
 def calculate_stress(monthly_income, monthly_expenses, total_emi, current_savings):
 
     if monthly_income == 0:
@@ -40,13 +51,24 @@ def calculate():
     total_emi = float(request.form['emi'])
     current_savings = float(request.form['savings'])
 
-    stress_score = calculate_stress(
-        monthly_income,
-        monthly_expenses,
-        total_emi,
-        current_savings
-    )
+    # 👉 ML Prediction (if model available)
+    if model_loaded:
+        features = np.array([[monthly_income, monthly_expenses, total_emi, current_savings]])
+        stress_score = model.predict(features)[0]
+    else:
+        # fallback to rule-based
+        stress_score = calculate_stress(
+            monthly_income,
+            monthly_expenses,
+            total_emi,
+            current_savings
+        )
 
+    # Normalize score
+    stress_score = max(0, min(100, float(stress_score)))
+    stress_score = round(stress_score, 2)
+
+    # Risk classification
     if stress_score <= 40:
         risk_level = "Low Risk"
     elif stress_score <= 70:
@@ -57,7 +79,8 @@ def calculate():
     return render_template(
         'index.html',
         score=stress_score,
-        risk=risk_level
+        risk=risk_level,
+        model_used="ML Model" if model_loaded else "Rule-Based System"
     )
 
 
